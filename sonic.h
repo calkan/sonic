@@ -11,6 +11,7 @@
 
 int make_sonic(parameters *);
 int load_sonic(parameters *);
+void gotta_go_fast();
 
 
 #endif
