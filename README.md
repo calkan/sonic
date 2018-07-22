@@ -10,12 +10,54 @@ Library only:
 Standalone SONIC builder:
 
 	make exe
-
+	
 # Standalone SONIC builder example:
 
 	sonic --ref hg19.fasta --dups hg19.dups.bed --reps hg19_repeats.out --gaps hg19.gap.bed --make-sonic ucsc_hg19.sonic --info "UCSC_hg19"
 
 	Duplications and gaps are expected in BED format. Repeats are in RepeatMasker .out format.
+
+# Downloading the Annotation files:
+
+In order to use the annotations to create a .sonic file, you need to prepare the files for annotations as follows:
+
+Using UCSC sequence and annotations download page (http://hgdownload.cse.ucsc.edu/downloads.html);
+
+
+1 - For reference genome, navigate to the related genome's "Full data set" page and download the chromFa FASTA files (i.e., http://hgdownload.cse.ucsc.edu/goldenPath/mm10/bigZips/chromFa.tar.gz is for mouse genome GRCm38/mm10)
+
+Extract the files into a folder and merge them into a single .fasta file:
+	
+	cat * >ref.fasta
+
+Sonic also requires the index file in the same folder:
+	
+	samtools faidx ref.fasta
+
+
+2 - For repeat annotations, navigate to the related genome's "Full data set" page and download the RepeatMasker .out files (i.e., http://hgdownload.cse.ucsc.edu/goldenPath/mm10/bigZips/chromOut.tar.gz is for mouse genome GRCm38/mm10)
+
+Extract the files into a folder and merge them into a single .out file:
+	
+	cat * >reps.out
+
+
+3 - For gap annotations, navigate to the related genome's "Full data set" page and download the description of how the assembly was generated (i.e., http://hgdownload.cse.ucsc.edu/goldenPath/mm4/bigZips/chromAgp.zip is for mouse genome GRCm38/mm10)
+
+Extract the files into a folder, merge them and grep the ones with component type U or N, then convert it to bed format:
+	
+	cat *|awk '{ if($5=="N" || $5=="U") print $1"\t"$2"\t7"$3}' > gaps.bed
+
+
+4 - For segmental duplication annotations, navigate to the related genome's "Annotation Database" page and download genomicsSuperDups file (i.e., http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/genomicSuperDups.txt.gz is for mouse genome GRCm38/mm10)
+
+Extract the file into a folder and convert it to bed format:
+	
+	cat genomicSuperDups.txt | awk '{print $2"\t"$3"\t"$4}' >dups.bed
+
+
+* You can copy ref.fasta, ref.fasta.fai, reps.out, gaps.bed and dups.bed into the folder where you want to run sonic and remove the others. Make sure all the annotations and the reference are of the same genome and version.
+
 
 # Building a SONIC file
 
