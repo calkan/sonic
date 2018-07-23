@@ -9,11 +9,9 @@ EXECUTABLE = libsonic.a
 INSTALLPATH = /usr/local/lib
 
 
-all: $(SOURCES) $(EXECUTABLE)
-	rm -rf *.o
-
-exe: $(EXESOURCES) $(EXECUTABLE)
+all: $(SOURCES) $(EXESOURCES) $(EXECUTABLE)
 	$(CC) $(EXESOURCES) $(EXECUTABLE) $(LDFLAGS) -o $(EXEFILE)
+	rm -rf *.o
 
 $(EXECUTABLE): $(OBJECTS) 
 	ar -rc $(EXECUTABLE)  $(OBJECTS) 

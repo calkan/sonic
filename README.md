@@ -1,15 +1,11 @@
 # sonic
 Some Organism's Nucleotide Information Container
 
-# Compilation
+# Fetching and building SONIC
 
-Library only:
-
+	git clone https://github.com/calkan/sonic.git
 	make
        
-Standalone SONIC builder:
-
-	make exe
 	
 # Standalone SONIC builder example:
 
@@ -59,7 +55,9 @@ Extract the file into a folder and convert it to bed format:
 * You can copy ref.fasta, ref.fasta.fai, reps.out, gaps.bed and dups.bed into the folder where you want to run sonic and remove the others. Make sure all the annotations and the reference are of the same genome and version.
 
 
-# Building a SONIC file
+# API Documentation
+
+## Building a SONIC file
 
 	int sonic_build(char *ref_genome, char *gaps, char *reps, char *dups, char *info, char *sonic);
 
@@ -76,7 +74,7 @@ Extract the file into a folder and convert it to bed format:
 		7: annotation files error
 		
 
-# Loading a SONIC file
+## Loading a SONIC file
 
 	sonic *sonic_load(char *sonic_file_name);
 
@@ -85,7 +83,7 @@ Extract the file into a folder and convert it to bed format:
 	RETURN VALUE:
 		a SONIC.
 
-# General-purpose interval search
+## General-purpose interval search
 
 	sonic_interval *sonic_intersect(sonic *sonic, char *chromosome, int start, int end, sonic_interval_type interval_type);
 
@@ -102,7 +100,7 @@ Extract the file into a folder and convert it to bed format:
 		pointer to a SONIC interval data structure on success.
 		NULL if not found.
 
-# Check if interval hits a satellite region
+## Check if interval hits a satellite region
 
 	int sonic_is_satellite(sonic *sonic, char *chromosome, int start, int end);
 
@@ -115,7 +113,7 @@ Extract the file into a folder and convert it to bed format:
 		1 if the interval is in a satellite region.
 		0 if it is not.
 
-# Check if interval hits a gap
+## Check if interval hits a gap
 
 	int sonic_is_gap(sonic *sonic, char *chromosome, int start, int end);
 
@@ -128,7 +126,7 @@ Extract the file into a folder and convert it to bed format:
 		1 if the interval is in a gap region.
 		0 if it is not.
 
-# Check if interval hits a segmental duplication region
+## Check if interval hits a segmental duplication region
 
 	int sonic_is_segmental_duplication(sonic *sonic, char *chromosome, int start, int end);
 
@@ -141,7 +139,7 @@ Extract the file into a folder and convert it to bed format:
 		1 if the interval is in a segmental duplication region.
 		0 if it is not.
 
-# Check if interval hits a mobile element
+## Check if interval hits a mobile element
 
 	sonic_repeat *sonic_is_mobile_element(sonic *sonic, char *chromosome, int start, int end, char *mei_string);
 
@@ -155,7 +153,7 @@ Extract the file into a folder and convert it to bed format:
 		pointer to a SONIC repeat data structure if the interval hits a mobile element.
 		NULL if it is not.
 
-# Get GC content over a region (as pre-calculated in non-overlapping 100 bp intervals).
+## Get GC content over a region (as pre-calculated in non-overlapping 100 bp intervals).
 
 	float sonic_get_gc_content(sonic *sonic, char *chromosome, int start, int end);
 
