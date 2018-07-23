@@ -13,11 +13,11 @@ Some Organism's Nucleotide Information Container
 
 	Duplications and gaps are expected in BED format. Repeats are in RepeatMasker .out format.
 
-# Downloading the Annotation files:
+# Downloading the annotation files:
 
-In order to use the annotations to create a .sonic file, you need to prepare the files for annotations as follows:
+To create a .sonic file, you need to prepare the files for reference genome annotations as follows:
 
-Using UCSC sequence and annotations download page (http://hgdownload.cse.ucsc.edu/downloads.html);
+Using UCSC sequence and annotations [download page](http://hgdownload.cse.ucsc.edu/downloads.html);
 
 
 1 - For reference genome, navigate to the related genome's "Full data set" page and download the chromFa FASTA files (i.e., http://hgdownload.cse.ucsc.edu/goldenPath/mm10/bigZips/chromFa.tar.gz is for mouse genome GRCm38/mm10)
