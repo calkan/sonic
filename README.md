@@ -42,14 +42,14 @@ Extract the files into a folder and merge them into a single .out file:
 
 Extract the files into a folder, merge them and grep the ones with component type U or N, then convert it to bed format:
 	
-	cat *|awk '{ if($5=="N" || $5=="U") print $1"\t"$2"\t7"$3}' > gaps.bed
+	cat *|awk '{ if($5=="N" || $5=="U") print $1"\t"$2"\t"$3}' > gaps.bed
 
 
 4 - For segmental duplication annotations, navigate to the related genome's "Annotation Database" page and download genomicsSuperDups file (i.e., http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/genomicSuperDups.txt.gz is for mouse genome GRCm38/mm10)
 
-Extract the file into a folder and convert it to bed format:
+Extract the file into a folder and convert it to BED format and sort and merge using [BEDtools](http://bedtools.readthedocs.io/en/latest/):
 	
-	cat genomicSuperDups.txt | awk '{print $2"\t"$3"\t"$4}' >dups.bed
+	 cat genomicSuperDups.txt | awk '{OFS="\t"; print $2,$3,$4"\n"$8,$9,$10}'| sortBed | mergeBed > dups.bed
 
 
 * You can copy ref.fasta, ref.fasta.fai, reps.out, gaps.bed and dups.bed into the folder where you want to run sonic and remove the others. Make sure all the annotations and the reference are of the same genome and version.
