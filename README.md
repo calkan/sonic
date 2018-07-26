@@ -36,6 +36,10 @@ Sonic also requires the index file in the same folder:
 Extract the files into a folder and merge them into a single .out file:
 	
 	cat * >reps.out
+	
+*Alternatively, if the files are inside directories for each chromosome, then use:
+
+	cat */* >reps.out
 
 
 3 - For gap annotations, navigate to the related genome's "Full data set" page and download the description of how the assembly was generated (i.e., http://hgdownload.cse.ucsc.edu/goldenPath/mm10/bigZips/chromAgp.zip is for mouse genome GRCm38/mm10)
@@ -43,6 +47,10 @@ Extract the files into a folder and merge them into a single .out file:
 Extract the files into a folder, merge them and grep the ones with component type U or N, then convert it to bed format:
 	
 	cat *|awk '{ if($5=="N" || $5=="U") print $1"\t"$2"\t"$3}' > gaps.bed
+
+*Alternatively, if the files are inside directories for each chromosome, then use:
+
+	cat */*|awk '{ if($5=="N" || $5=="U") print $1"\t"$2"\t"$3}' > gaps.bed
 
 
 4 - For segmental duplication annotations, navigate to the related genome's "Annotation Database" page and download genomicsSuperDups file (i.e., http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/genomicSuperDups.txt.gz is for mouse genome GRCm38/mm10)
