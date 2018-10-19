@@ -672,11 +672,15 @@ void free_sonic(sonic *this_sonic)
   number_of_chromosomes = this_sonic->number_of_chromosomes;
 
   for (i = 0; i < number_of_chromosomes; i++){
+    /*
     sonic_free_mem(this_sonic->chromosome_names[i], strlen(this_sonic->chromosome_names[i]));
     sonic_free_mem(this_sonic->chromosome_gc_profile[i], sizeof(char *) * (this_sonic->chromosome_lengths[i] / (SONIC_GC_WINDOW)));
     free_sonic_interval(this_sonic->gaps[i], this_sonic->number_of_gaps_in_chromosome[i], 0);
     free_sonic_interval(this_sonic->dups[i], this_sonic->number_of_dups_in_chromosome[i], 0);
     free_sonic_interval(this_sonic->reps[i], this_sonic->number_of_repeats_in_chromosome[i], 1);
+    */
+    sonic_free_chromosome(this_sonic, i);
+    sonic_free_mem(this_sonic->chromosome_names[i], strlen(this_sonic->chromosome_names[i]));
   }
   
 
@@ -696,6 +700,40 @@ void free_sonic(sonic *this_sonic)
   
   sonic_free_mem(this_sonic, sizeof(sonic));
   
+}
+
+
+void sonic_free_chromosome(sonic *this_sonic, int chromosome_id)
+{
+
+
+  if (this_sonic == NULL || chromosome_id >= this_sonic->number_of_chromosomes)
+    return;
+
+  if (this_sonic->gaps[chromosome_id] == NULL)
+    return;
+ 
+  fprintf(stderr, "[SONIC] free chromosome [%d: %s]\n", chromosome_id, this_sonic->chromosome_names[chromosome_id]);
+  sonic_free_mem(this_sonic->chromosome_gc_profile[chromosome_id], sizeof(char *) * (this_sonic->chromosome_lengths[chromosome_id] / (SONIC_GC_WINDOW)));
+  free_sonic_interval(this_sonic->gaps[chromosome_id], this_sonic->number_of_gaps_in_chromosome[chromosome_id], 0);
+  free_sonic_interval(this_sonic->dups[chromosome_id], this_sonic->number_of_dups_in_chromosome[chromosome_id], 0);
+  free_sonic_interval(this_sonic->reps[chromosome_id], this_sonic->number_of_repeats_in_chromosome[chromosome_id], 1);
+
+  this_sonic->chromosome_gc_profile[chromosome_id] = NULL;
+  this_sonic->gaps[chromosome_id] = NULL;
+  this_sonic->dups[chromosome_id] = NULL;
+  this_sonic->reps[chromosome_id] = NULL;  
+  
+}
+
+void sonic_free_chromosome_byname(sonic *this_sonic, char *this_chromosome)
+{
+
+  int chromosome_id;
+
+  chromosome_id = sonic_refind_chromosome_index(this_sonic, this_chromosome);
+
+  sonic_free_chromosome(this_sonic, chromosome_id);
 }
 
 void free_sonic_interval(sonic_interval *this_sonic_interval, int number_of_entries, int is_repeat)

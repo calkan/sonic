@@ -54,6 +54,8 @@ void sonic_write_bed_entries(gzFile, sonic_bed_line *, int, int, char **);
 sonic_bed_line *sonic_read_bed_file(FILE *, int, int);
 void sonic_write_repeat_item(gzFile, sonic_repeat *);
 void free_sonic(sonic *);
+void sonic_free_chromosome(sonic *, int);
+void sonic_free_chromosome_byname(sonic *, char *);
 void free_sonic_interval(sonic_interval *, int, int);
 double sonic_get_mem_usage(void);
 
