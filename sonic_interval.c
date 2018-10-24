@@ -1,4 +1,3 @@
-
 #include "sonic_interval.h"
 #include "sonic.h"
 
@@ -161,7 +160,7 @@ int sonic_this_interval_intersects(int pos_start, int pos_end, int start, int en
 }
 
 
-int sonic_is_satellite(sonic *this_sonic, const char *this_chromosome, int pos_start, int pos_end){
+float sonic_is_satellite(sonic *this_sonic, const char *this_chromosome, int pos_start, int pos_end){
   sonic_interval *this_interval;
   char *is_satellite;
 
@@ -173,27 +172,27 @@ int sonic_is_satellite(sonic *this_sonic, const char *this_chromosome, int pos_s
 
   is_satellite = strstr(this_interval->repeat_item->repeat_class, "Satel");
   if (is_satellite != NULL)
-    return 1;
+    return intersection_fraction(pos_start, pos_end, this_interval->start, this_interval->end);
 
   is_satellite = strstr(this_interval->repeat_item->repeat_type, "Satel");
   if (is_satellite != NULL)
-    return 1;
+    return intersection_fraction(pos_start, pos_end, this_interval->start, this_interval->end);
 
   return 0;
     
   
 }
 
-int sonic_is_segmental_duplication(sonic *this_sonic, const char *this_chromosome, int pos_start, int pos_end){
+float sonic_is_segmental_duplication(sonic *this_sonic, const char *this_chromosome, int pos_start, int pos_end){
 
   sonic_interval *this_interval;
-
+  
   this_interval = sonic_intersect(this_sonic, this_chromosome, pos_start, pos_end, SONIC_DUP);
 
   if (this_interval == NULL)
-    return 0;
+    return 0.0;
 
-  return 1;
+  return intersection_fraction(pos_start, pos_end, this_interval->start, this_interval->end);
     
 }
 
@@ -271,4 +270,25 @@ float sonic_get_gc_content(sonic *this_sonic, const char *this_chromosome, int p
     return (gc_content / window_count);
   else
     return 0.0;
+}
+
+
+float intersection_fraction(int start_1, int end_1, int start_2, int end_2){
+
+  /* calculates the fraction of interval1[start_1, end_2] that intersects with interval2[start_2, end_2] */
+  
+  if (start_1 >= start_2 && end_1 <= end_2)
+    return 1.0;
+
+  if (start_1 >= start_2 && end_1 >= end_2)
+    return (float)(end_2 - start_1) / (float)(end_1-start_1);
+
+  if (start_1 <= start_2 && end_1 <= end_2)
+    return (float)(end_1 - start_2) / (float)(end_1-start_1);
+
+  if (start_1 <= start_2 && end_1 <= end_2)
+    return (float)(end_2 - start_2) / (float)(end_1-start_1);
+
+  return 0.0;
+
 }

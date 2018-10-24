@@ -154,7 +154,6 @@ void sonic_read_gc_profile(gzFile sonic_file, sonic *this_sonic)
 		while ((int)gc_content != SONIC_END_OF_CHR){
 			this_sonic->chromosome_gc_profile[chromosome_index][window_id++] = gc_content;
 			return_value = gzread(sonic_file, &gc_content, sizeof(gc_content));
-
 		}
 	}
 }
