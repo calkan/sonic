@@ -7,13 +7,33 @@ sonic *test_sonic;
 
 char bedfile[1024];
 
+int print_help(char *prog_name){
+
+  fprintf(stderr, "\nSONIC: Some Organism's Nucleotide Information Container.\nVersion: %s\n\n", SONIC_VERSION);
+  fprintf(stderr, "Usage: %s [arguments]\n\n", prog_name);
+  fprintf(stderr, "COMPULSORY PARAMETERS FOR CREATING SONIC:\n");
+  fprintf(stderr, "\t--ref        [in.fasta]        : Reference genome FASTA file.\n");
+  fprintf(stderr, "\t--gaps       [gap.bed]         : Reference genome assembly gap coodinates (BED).\n");
+  fprintf(stderr, "\t--reps       [repeatmasker.out]: RepeatMasker output files (.out).\n");
+  fprintf(stderr, "\t--dups       [dups.bed]        : Segmental duplication coordinates in the reference (BED).\n");
+  fprintf(stderr, "\t--make-sonic [ref.sonic]       : SONIC file to be created.\n");
+  fprintf(stderr, "VALIDATING EXISTING SONIC FILE:\n");
+  fprintf(stderr, "\t--test-sonic [ref.sonic]       : SONIC file to be checked for validity.\n");  
+  fprintf(stderr, "OPTIONAL PARAMETERS:\n");
+  fprintf(stderr, "\t--mei        [Alu:L1:SVA]      : Colon-seperated obile element class names in RepeatMasker file. Default: Alu:L1:SVA.\n");
+  fprintf(stderr, "\t--info       [info_string]     : Information string to annotate the SONIC file with, such as version.\n");
+  fprintf(stderr, "\t--help                         : Print this help information and exit.\n\n");
+  return 0;
+}
+
 int parse_command_line( int argc, char** argv)
 {
         int index;
 	int o;
 
-	static int do_make_sonic = 0;
-	static int do_load_sonic = 0;
+	static int do_make_sonic = 1;
+	static int do_test_sonic = 0;
+	static int do_load_sonic = 0; // this is for testing purposes only
 	char ref_genome[1024];
 	char gaps[1024];
 	char dups[1024];
@@ -39,17 +59,19 @@ int parse_command_line( int argc, char** argv)
 			{"mei"    , required_argument,   0, 'm'},
 			{"info"    , required_argument,   0, 'i'},
 			{"make-sonic"    , required_argument,	 0, 'c'},
-			{"sonic"    , required_argument,	 0, 's'},
-			{"bed"    , required_argument,	 0, 'b'},
+			{"test-sonic"    , required_argument,	 0, 't'},
+			{"help"    , no_argument,	 0, 'h'},
+			{"sonic"    , required_argument,	 0, 's'}, /* testing purposes only */
+			{"bed"    , required_argument,	 0, 'b'}, /* testing purposes only */
 			{0        , 0,                   0,  0 }
 	};
 
 	if( argc == 1)
 	{
-		return 0;
+	  return print_help(argv[0]);
 	}
 
-	while( ( o = getopt_long( argc, argv, "f:i:g:d:r:m:c:s:b:", long_options, &index)) != -1)
+	while( ( o = getopt_long( argc, argv, "f:i:g:d:r:m:c:h:s:b:t:", long_options, &index)) != -1)
 	{
 		switch( o)
 		{
@@ -65,6 +87,13 @@ int parse_command_line( int argc, char** argv)
 		case 's':
 			strcpy(  sonic, optarg);
 			do_load_sonic = 1;
+			do_make_sonic = 0;
+			break;
+
+		case 't':
+			strcpy(  sonic, optarg);
+			do_test_sonic = 1;
+			do_make_sonic = 0;
 			break;
 
 		case 'c':
@@ -91,7 +120,9 @@ int parse_command_line( int argc, char** argv)
 		case 'b':
 			strcpy(  bedfile, optarg);
 			break;
-
+		case 'h':
+ 		        return print_help(argv[0]);
+			break;
 		}
 	}
 
@@ -133,6 +164,18 @@ int parse_command_line( int argc, char** argv)
 
 	if (do_load_sonic){
 	  test_sonic = sonic_load(sonic);
+	  return 1;
+	} 
+
+	if (do_test_sonic){
+	  test_sonic = sonic_load(sonic);
+	  if (test_sonic == NULL){
+	    fprintf( stderr, "[SONIC] The SONIC file %s is invalid.\n", sonic);
+	    exit (-1);
+	  }
+	  fprintf( stderr, "[SONIC] Number of chromosomes: %d\n", test_sonic->number_of_chromosomes);
+	  fprintf( stderr, "[SONIC] Genome length: %ld\n", test_sonic->genome_length);
+	  fprintf( stderr, "[SONIC] The SONIC file %s seems to be valid.\n", sonic);
 	  return 1;
 	} 
 
@@ -192,6 +235,7 @@ int main(int argc, char **argv){
 
     
   }
+
 
   if (loaded)
     free_sonic(test_sonic);

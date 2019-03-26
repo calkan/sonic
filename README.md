@@ -110,7 +110,7 @@ Extract the file into a folder and convert it to BED format and sort and merge u
 
 ## Check if interval hits a satellite region
 
-	int sonic_is_satellite(sonic *sonic, char *chromosome, int start, int end);
+	float sonic_is_satellite(sonic *sonic, char *chromosome, int start, int end);
 
 	sonic: Loaded SONIC.
 	chromosome: name of the chromosome of the interval of interest.
@@ -118,7 +118,7 @@ Extract the file into a folder and convert it to BED format and sort and merge u
 	end: end coordinate of the interval of interest (exclusive -- BED-like).
 
 	RETURN VALUE:
-		1 if the interval is in a satellite region.
+		>0 if the interval is in a satellite region,  it will return the fraction of the interval that is covered by satellites.
 		0 if it is not.
 
 ## Check if interval hits a gap
@@ -136,7 +136,7 @@ Extract the file into a folder and convert it to BED format and sort and merge u
 
 ## Check if interval hits a segmental duplication region
 
-	int sonic_is_segmental_duplication(sonic *sonic, char *chromosome, int start, int end);
+	float sonic_is_segmental_duplication(sonic *sonic, char *chromosome, int start, int end);
 
 	sonic: Loaded SONIC.
 	chromosome: name of the chromosome of the interval of interest.
@@ -144,7 +144,7 @@ Extract the file into a folder and convert it to BED format and sort and merge u
 	end: end coordinate of the interval of interest (exclusive -- BED-like).
 
 	RETURN VALUE:
-		1 if the interval is in a segmental duplication region.
+		>0 if the interval is in a segmental duplication region, it will return the fraction of the interval that is covered by segmental duplication.
 		0 if it is not.
 
 ## Check if interval hits a mobile element

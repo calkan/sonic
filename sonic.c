@@ -223,7 +223,7 @@ sonic *sonic_load(char *sonic_file_name){
     chromosome[chrom_name_length] = 0;
     return_value = gzread(sonic_file, &chromosome_length, sizeof(int));
     sonic_set_str(&(this_sonic->chromosome_names[i]), chromosome);
-    this_sonic->chromosome_gc_profile[i] = (char *) sonic_get_mem(sizeof(char ) * (int)(ceil(chromosome_length / (SONIC_GC_WINDOW))));
+    this_sonic->chromosome_gc_profile[i] = (char *) sonic_get_mem(sizeof(char ) * (int)(ceil(chromosome_length / (SONIC_GC_WINDOW)) + 1));
     this_sonic->chromosome_lengths[i] = chromosome_length;
     this_sonic->genome_length += chromosome_length;
     /* fprintf(stderr, "Chromosome name: %s, length: %d\n", chromosome, chromosome_length); */
@@ -712,9 +712,11 @@ void sonic_free_chromosome(sonic *this_sonic, int chromosome_id)
 
   if (this_sonic->gaps[chromosome_id] == NULL)
     return;
- 
-  fprintf(stderr, "[SONIC] free chromosome [%d: %s]\n", chromosome_id, this_sonic->chromosome_names[chromosome_id]);
-  sonic_free_mem(this_sonic->chromosome_gc_profile[chromosome_id], sizeof(char *) * (int)ceil(this_sonic->chromosome_lengths[chromosome_id] / (SONIC_GC_WINDOW)));
+
+  /*
+    fprintf(stderr, "[SONIC] free chromosome [%d: %s]\n", chromosome_id, this_sonic->chromosome_names[chromosome_id]);
+  */
+  sonic_free_mem(this_sonic->chromosome_gc_profile[chromosome_id], sizeof(char *) * (int)ceil(this_sonic->chromosome_lengths[chromosome_id] / (SONIC_GC_WINDOW)) +  1);
   free_sonic_interval(this_sonic->gaps[chromosome_id], this_sonic->number_of_gaps_in_chromosome[chromosome_id], 0);
   free_sonic_interval(this_sonic->dups[chromosome_id], this_sonic->number_of_dups_in_chromosome[chromosome_id], 0);
   free_sonic_interval(this_sonic->reps[chromosome_id], this_sonic->number_of_repeats_in_chromosome[chromosome_id], 1);
