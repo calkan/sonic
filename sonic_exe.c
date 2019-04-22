@@ -23,6 +23,7 @@ int print_help(char *prog_name){
   fprintf(stderr, "\t--mei        [Alu:L1:SVA]      : Colon-seperated obile element class names in RepeatMasker file. Default: Alu:L1:SVA.\n");
   fprintf(stderr, "\t--info       [info_string]     : Information string to annotate the SONIC file with, such as version.\n");
   fprintf(stderr, "\t--help                         : Print this help information and exit.\n\n");
+  fprintf(stderr, "\t--version                      : Print version information and exit.\n\n");
   return 0;
 }
 
@@ -61,6 +62,7 @@ int parse_command_line( int argc, char** argv)
 			{"make-sonic"    , required_argument,	 0, 'c'},
 			{"test-sonic"    , required_argument,	 0, 't'},
 			{"help"    , no_argument,	 0, 'h'},
+			{"version"    , no_argument,	 0, 'v'},
 			{"sonic"    , required_argument,	 0, 's'}, /* testing purposes only */
 			{"bed"    , required_argument,	 0, 'b'}, /* testing purposes only */
 			{0        , 0,                   0,  0 }
@@ -71,7 +73,7 @@ int parse_command_line( int argc, char** argv)
 	  return print_help(argv[0]);
 	}
 
-	while( ( o = getopt_long( argc, argv, "f:i:g:d:r:m:c:h:s:b:t:", long_options, &index)) != -1)
+	while( ( o = getopt_long( argc, argv, "f:i:g:d:r:m:c:h:s:b:t:v:", long_options, &index)) != -1)
 	{
 		switch( o)
 		{
@@ -122,6 +124,10 @@ int parse_command_line( int argc, char** argv)
 			break;
 		case 'h':
  		        return print_help(argv[0]);
+			break;
+		case 'v':
+		        fprintf(stderr, "\nSONIC: Some Organism's Nucleotide Information Container.\nVersion: %s\n\n", SONIC_VERSION);
+		        return 0;
 			break;
 		}
 	}
@@ -176,6 +182,7 @@ int parse_command_line( int argc, char** argv)
 	  fprintf( stderr, "[SONIC] Number of chromosomes: %d\n", test_sonic->number_of_chromosomes);
 	  fprintf( stderr, "[SONIC] Genome length: %ld\n", test_sonic->genome_length);
 	  fprintf( stderr, "[SONIC] The SONIC file %s seems to be valid.\n", sonic);
+	  fprintf( stdout, "Memory usage: %0.2f MB.\n", sonic_get_mem_usage());	  
 	  return 1;
 	} 
 

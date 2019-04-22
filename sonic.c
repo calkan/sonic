@@ -106,8 +106,8 @@ int sonic_build(char *ref_genome, char *gaps, char *reps, char *dups, char *info
   free(bed_entry);
 
   
-  fprintf( stderr, "Adding repeats to SONIC.\n");
   line_count = count_bed_lines(reps_file);
+  fprintf( stderr, "Adding %d repeats to SONIC.\n", line_count);
   rewind(reps_file);
 
   bed_entry = sonic_read_bed_file(reps_file, line_count, 1);
@@ -126,7 +126,7 @@ int sonic_build(char *ref_genome, char *gaps, char *reps, char *dups, char *info
 
 
   /* gc profile here */
-
+  fprintf( stderr, "Adding GC profile SONIC.\n");
   sonic_write_gc_profile(sonic_file, ref_file, number_of_chromosomes, chromosome_names);
   
   for (i=0; i < number_of_chromosomes; i++)  /* free memory */
@@ -459,8 +459,9 @@ void sonic_write_bed_entries(gzFile sonic_file, sonic_bed_line *bed_entry, int l
 
   
   for (i=0; i < number_of_chromosomes; i++){
+    fprintf ( stderr, "\rWriting entries for chromosome %d", i);
     number_of_entries = count_bed_chromosome_entries(bed_entry, line_count, chromosome_names[i]);
-    
+    /* this is bad coding. the bed_entry_is supposed to be sorted. Make sure it is the same order as in chromosome_names. Do something about it. */
     return_value = gzwrite(sonic_file, &number_of_entries, sizeof(number_of_entries)); /* number of gaps in this chromosome */
     chromosome_found = 0;
     for (j = 0; j < line_count; j++){
@@ -481,7 +482,7 @@ void sonic_write_bed_entries(gzFile sonic_file, sonic_bed_line *bed_entry, int l
     }    
   }
 
-  fprintf(stderr, "Wrote %d entries.\n", wrote);
+  fprintf(stderr, "\nWrote %d entries.\n", wrote);
 }
 
 sonic_bed_line *sonic_read_bed_file(FILE *bed_file, int line_count, int is_repeat)
@@ -532,6 +533,7 @@ sonic_bed_line *sonic_read_bed_file(FILE *bed_file, int line_count, int is_repea
 	return_value_char = fgets(skip_line, MAX_LENGTH, bed_file); /* skip the second header line */
 	return_value_char = fgets(skip_line, MAX_LENGTH, bed_file); /* skip the empty line */
 	if (return_value_char == NULL){
+	  fprintf(stderr, "return_value_char is NULL. No lines found after header. Exiting SONIC.\n");
 	  exit(EXIT_SONIC);
 	}
 
@@ -540,10 +542,12 @@ sonic_bed_line *sonic_read_bed_file(FILE *bed_file, int line_count, int is_repea
       
       /* data starts here */
       
-      return_value = fscanf(bed_file, "%f%f%f%s%d%d%s%s%s%s%s%s%s%d\n", &perc_div, &perc_del, &perc_ins, chromosome,
+      return_value = fscanf(bed_file, "%f%f%f%s%d%d%s%s%s%s%s%s%s%d", &perc_div, &perc_del, &perc_ins, chromosome,
 			    &start, &end, chrom_left, strand, repeat_type, repeat_class, repeat_start_string, repeat_end_string, repeat_left, &repeat_id);
+      return_value_char = fgets(skip_line, MAX_LENGTH, bed_file); /* skip possible * at the end of the line */
       
       if (return_value == 0){
+	fprintf(stderr, "return_value is 0 - sw_score=%s. RepeatMasker .out file has a problem. Exiting SONIC.\n", sw_score);
 	exit(EXIT_SONIC);
       }
       
@@ -578,7 +582,7 @@ sonic_bed_line *sonic_read_bed_file(FILE *bed_file, int line_count, int is_repea
     }
     
   }
-  
+  fprintf( stderr, "Read %d BED entries.\n", i);
   qsort(bed_entry, line_count, sizeof(sonic_bed_line), bed_comp); /* sort the bed entries */
   return bed_entry;
 }

@@ -1,4 +1,4 @@
-SONIC_VERSION := "1.1"
+SONIC_VERSION := "1.2"
 CC=gcc
 CFLAGS = -O3 -g -Wall -Wextra -pedantic -Wwrite-strings -DSONIC_VERSION=\"$(SONIC_VERSION)\"
 LDFLAGS = -lz -lm -lpthread -Wall
