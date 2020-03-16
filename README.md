@@ -13,6 +13,15 @@ Some Organism's Nucleotide Information Container
 
 	Duplications and gaps are expected in BED format. Repeats are in RepeatMasker .out format.
 
+# Important things to consider when building and using SONIC files:
+
+Some genomes (for example, human) may have different naming standards for chromosomes. The UCSC version of human reference version hg19 is equivalent to GRC Build 37 (except the mitochondria), but the naming 
+schemes are different. UCSC hg19 names chromosomes as chr1, chr2, etc.; where GRC Build 37 uses 1, 2, etc. Fortunately this irregularity is solved in hg38/GRCh38. Similarly, UCSC version of C. elegans 
+chromosomes are named as chrI, chrII, and Wormbase version is named as I, II, etc. Same goes for mouse genome, and many others.
+
+When building a SONIC file, or using it with the API we provide, make sure that chromosome naming matches across all your files: reference FASTA, RepeatMasker .out, gaps, and duplications. 
+Also make sure that your BAM file matches if you are using SONIC within TARDIS or VALOR, or any other tool. 
+
 # Downloading the annotation files:
 
 To create a .sonic file, you need to prepare the files for reference genome annotations as follows:
@@ -37,7 +46,7 @@ Extract the files into a folder and merge them into a single .out file:
 	
 	cat * >reps.out
 	
-*Alternatively, if the files are inside directories for each chromosome, then use:
+* Alternatively, if the files are inside directories for each chromosome, then use:
 
 	cat */* >reps.out
 
@@ -48,16 +57,25 @@ Extract the files into a folder, merge them and grep the ones with component typ
 	
 	cat *|awk '{ if($5=="N" || $5=="U") print $1"\t"$2"\t"$3}' > gaps.bed
 
-*Alternatively, if the files are inside directories for each chromosome, then use:
+* Alternatively, if the files are inside directories for each chromosome, then use:
 
 	cat */*|awk '{ if($5=="N" || $5=="U") print $1"\t"$2"\t"$3}' > gaps.bed
 
+* If the genome you are using has no assembly gaps, you can use an empty file. The gaps file is used to filter out calls that span assembly gaps, 
+certainly an issue in mammalian genomes since those gaps are surrounded by repeats, causing mapping ambiguity. Create one as:
+	
+	touch gaps.bed
 
 4 - For segmental duplication annotations, navigate to the related genome's "Annotation Database" page and download genomicsSuperDups file (i.e., http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/genomicSuperDups.txt.gz is for mouse genome GRCm38/mm10)
 
 Extract the file into a folder and convert it to BED format and sort and merge using [BEDtools](http://bedtools.readthedocs.io/en/latest/):
 	
 	 cat genomicSuperDups.txt | awk '{OFS="\t"; print $2,$3,$4"\n"$8,$9,$10}'| sortBed | mergeBed > dups.bed
+
+* If the genome you are using has no segmental duplications, you can use an empty file. The duplications file is used to filter out calls that may have originated
+due to ambiguous mapping within segmental duplications. Create one as:
+	
+	touch dups.bed
 
 
 * You can copy ref.fasta, ref.fasta.fai, reps.out, gaps.bed and dups.bed into the folder where you want to run sonic and remove the others. Make sure all the annotations and the reference are of the same genome and version.
