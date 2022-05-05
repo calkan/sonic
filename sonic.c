@@ -528,7 +528,8 @@ sonic_bed_line *sonic_read_bed_file(FILE *bed_file, int line_count, int is_repea
     /* assuming vanilla RepeatMasker .out files here -- concatenated */
     while (fscanf(bed_file, "%s", sw_score) > 0){
       
-      if (!strcmp(sw_score, "SW")){
+      //if (!strcmp(sw_score, "SW")){
+      if (!isdigit(sw_score[0])){
 	return_value_char = fgets(skip_line, MAX_LENGTH, bed_file); /* skip the first header line */
 	return_value_char = fgets(skip_line, MAX_LENGTH, bed_file); /* skip the second header line */
 	return_value_char = fgets(skip_line, MAX_LENGTH, bed_file); /* skip the empty line */
