@@ -159,6 +159,7 @@ sonic *sonic_load(char *sonic_file_name){
   int start, end;
   int number_of_chromosomes;
   int number_of_entries;
+  int total_entries;
   int chromosome_length;
   int i, j;
 
@@ -230,8 +231,8 @@ sonic *sonic_load(char *sonic_file_name){
   }
 
   
-  fprintf( stderr, "Loading gap intervals.\n");
-
+  fprintf( stderr, "Loading gap intervals... ");
+  total_entries = 0;
 
   for (i=0; i < number_of_chromosomes; i++){
     return_value = gzread(sonic_file, &number_of_entries, sizeof(number_of_entries)); /* number of gaps in this chromosome */
@@ -241,7 +242,8 @@ sonic *sonic_load(char *sonic_file_name){
       this_sonic->gaps[i] = alloc_sonic_interval(number_of_entries, 0);
     else
       this_sonic->gaps[i] = NULL;
-    
+
+    total_entries += number_of_entries;
     for (j = 0; j < number_of_entries; j++){
       return_value = gzread(sonic_file, &start, sizeof(start));
       return_value = gzread(sonic_file, &end, sizeof(end));
@@ -250,9 +252,11 @@ sonic *sonic_load(char *sonic_file_name){
       /* fprintf(stderr, "[gaps]\t%d\t%d\n", start, end); */
     }
   }    
-
-  fprintf( stderr, "Loading duplication intervals.\n");
-
+  
+  fprintf( stderr, "%d intervals loaded.\n", total_entries);
+  fprintf( stderr, "Loading duplication intervals... ");
+  total_entries = 0;
+  
   for (i=0; i < number_of_chromosomes; i++){
     return_value = gzread(sonic_file, &number_of_entries, sizeof(number_of_entries)); /* number of gaps in this chromosome */
     /* fprintf(stderr, "Chromosome %d dups %d\n", i, number_of_entries); */
@@ -262,7 +266,8 @@ sonic *sonic_load(char *sonic_file_name){
       this_sonic->dups[i] = alloc_sonic_interval(number_of_entries, 0);
     else
       this_sonic->dups[i] = NULL;
-    
+
+    total_entries += number_of_entries;
     for (j = 0; j < number_of_entries; j++){
       return_value = gzread(sonic_file, &start, sizeof(start));
       return_value = gzread(sonic_file, &end, sizeof(end));
@@ -273,9 +278,10 @@ sonic *sonic_load(char *sonic_file_name){
 
   }    
 
-
-  fprintf( stderr, "Loading repeats.\n");
-
+  fprintf( stderr, "%d intervals loaded.\n", total_entries);
+  fprintf( stderr, "Loading repeats... ");
+  total_entries = 0;
+  
   for (i=0; i < number_of_chromosomes; i++){
     return_value = gzread(sonic_file, &number_of_entries, sizeof(number_of_entries)); /* number of gaps in this chromosome */
     /*    fprintf(stderr, "Chromosome %d reps %d\n", i, number_of_entries); */
@@ -286,6 +292,7 @@ sonic *sonic_load(char *sonic_file_name){
     else
       this_sonic->reps[i] = NULL;
 
+    total_entries += number_of_entries;
     for (j = 0; j < number_of_entries; j++){
       return_value = gzread(sonic_file, &start, sizeof(start));
       return_value = gzread(sonic_file, &end, sizeof(end));
@@ -318,7 +325,7 @@ sonic *sonic_load(char *sonic_file_name){
 
   /* read GC profiles */
 
-  
+  fprintf( stderr, "%d intervals loaded.\n", total_entries);
   sonic_read_gc_profile(sonic_file, this_sonic);
   
   gzclose(sonic_file);
@@ -528,7 +535,6 @@ sonic_bed_line *sonic_read_bed_file(FILE *bed_file, int line_count, int is_repea
     /* assuming vanilla RepeatMasker .out files here -- concatenated */
     while (fscanf(bed_file, "%s", sw_score) > 0){
       
-      //if (!strcmp(sw_score, "SW")){
       if (!isdigit(sw_score[0])){
 	return_value_char = fgets(skip_line, MAX_LENGTH, bed_file); /* skip the first header line */
 	return_value_char = fgets(skip_line, MAX_LENGTH, bed_file); /* skip the second header line */
